@@ -37,15 +37,10 @@ jobs:
           Start-Process msiexec.exe -ArgumentList "/i", "`"$installerPath`"", "/quiet", "/norestart" -Wait
           Remove-Item $installerPath -Force
 
-      - name: Establish Tailscale Connection
+      - name: Establish Tailscale Connection - Roblox Bypass
         run: |
-          & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTH_KEY }} --hostname=gh-runner-$env:GITHUB_RUN_ID --accept-routes=false --shields-up=false
-
-      - name: Bypass Roblox VPN
-        run: |
-          route add 128.116.0.0 mask 255.255.0.0 0.0.0.0 METRIC 1
-          route add 128.8.0.0 mask 255.255.0.0 0.0.0.0 METRIC 1
-          Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
+          & "$env:ProgramFiles\Tailscale\tailscale.exe" up --authkey=${{ secrets.TAILSCALE_AUTH_KEY }} --hostname=gh-runner-$env:GITHUB_RUN_ID --accept-routes=false --exit-node-allow-lan-access --shields-up=false
+          Write-Host "Tailscale connected WITHOUT hijacking internet, Roblox will use direct internet"
 
       - name: Get Tailscale IP
         run: |
